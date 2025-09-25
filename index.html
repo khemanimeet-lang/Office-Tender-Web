@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petropath Fluids India Ltd. Tender Tracker</title>
+    <style>
+        /* CSS styles remain the same */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
+            --border-color: #dee2e6;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: var(--light-bg);
+            color: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: var(--dark-bg);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        form {
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: var(--light-bg);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="datetime-local"], input[type="date"], textarea, #search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        #add-tender-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        #enable-notifications {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        #logout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        #search-input {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr.completed {
+            background-color: #e9ecef;
+            color: var(--secondary-color);
+            text-decoration: line-through;
+        }
+        
+        .edit-btn {
+            background-color: var(--warning-color);
+            color: var(--dark-bg);
+            padding: 5px 10px;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="petropath_logo.png" alt="Petropath Logo" style="width: 50px;">
+                <h1>Tender Tracking System</h1>
+            </div>
+            <div>
+                <span style="font-weight: bold; margin-right: 10px;">Welcome, <span id="welcome-username"></span>!</span>
+                <button id="logout-btn" style="margin-left: 10px;">Log Out</button>
+            </div>
+        </div>
+        
+        <form id="tender-form">
+            <input type="hidden" id="edit-index">
+            <div class="form-group">
+                <label for="bid-number">Bid Number:</label>
+                <input type="text" id="bid-number" name="bid-number" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="start-date">Bid Start Date & Time:</label>
+                <input type="datetime-local" id="start-date" name="start-date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="end-date">Bid End Date & Time:</label>
+                <input type="datetime-local" id="end-date" name="end-date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="organization-name">Organization Name:</label>
+                <input type="text" id="organization-name" name="organization-name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="item-category">Item Category:</label>
+                <input type="text" id="item-category" name="item-category" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="bid-to-ra">Bid to RA Enabled:</label>
+                <input type="checkbox" id="bid-to-ra" name="bid-to-ra">
+            </div>
+            
+            <div class="form-group">
+                <label for="pre-bid-meeting">Pre-Bid Meeting Date & Time:</label>
+                <input type="datetime-local" id="pre-bid-meeting" name="pre-bid-meeting">
+            </div>
+            
+            <div class="form-group">
+                <label for="pre-bid-queries">Pre-Bid Queries Date & Time:</label>
+                <input type="datetime-local" id="pre-bid-queries" name="pre-bid-queries">
+            </div>
+            
+            <div class="form-group">
+                <label for="post-bid-meeting">Post-Bid Meeting Date & Time:</label>
+                <input type="datetime-local" id="post-bid-meeting" name="post-bid-meeting">
+            </div>
+            
+            <div class="form-group">
+                <label for="post-bid-queries">Post-Bid Queries Date & Time:</label>
+                <input type="datetime-local" id="post-bid-queries" name="post-bid-queries">
+            </div>
+            
+            <div class="form-group">
+                <label for="submission-date">Tender Submission Date:</label>
+                <input type="date" id="submission-date" name="submission-date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="technical-evaluation">Technical Evaluation Criteria:</label>
+                <textarea id="technical-evaluation" name="technical-evaluation" rows="4" cols="50"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="disqualified">Disqualified & Representation Details:</label>
+                <textarea id="disqualified" name="disqualified" rows="4" cols="50"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="financial-bid">Financial Bid (L1, L2, L3, Price):</label>
+                <textarea id="financial-bid" name="financial-bid" rows="4" cols="50"></textarea>
+            </div>
+            
+            <button type="submit" id="add-tender-btn">Add Tender</button>
+        </form>
+        
+        <hr>
+        
+        <button id="enable-notifications">Enable Notifications</button>
+        <button id="export-btn">Export Tenders</button>
+        <input type="text" id="search-input" placeholder="Search by Bid Number or Organization...">
+
+        <h2>Saved Tenders</h2>
+        <table id="tenders-table">
+            <thead>
+                <tr>
+                    <th>Bid Number</th>
+                    <th>Organization</th>
+                    <th>Bid End Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+    <script>
+        // The API_BASE_URL is now your live Render server address
+        const API_BASE_URL = 'https://tender-tracker-api-live.onrender.com/api/tenders'; 
+        
+        // Check if a user is logged in. If not, redirect to login page.
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        const user = JSON.parse(currentUser);
+        const username = user.username;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const tenderForm = document.getElementById('tender-form');
+            const enableNotificationsButton = document.getElementById('enable-notifications');
+            const logoutBtn = document.getElementById('logout-btn');
+            const submitButton = document.getElementById('add-tender-btn');
+            const searchInput = document.getElementById('search-input');
+            const welcomeUsername = document.getElementById('welcome-username');
+            const exportBtn = document.getElementById('export-btn');
+
+            welcomeUsername.textContent = username;
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('currentUser');
+                    // The logout page is at the root of the GitHub Pages site
+                    window.location.href = 'login.html'; 
+                });
+            }
+
+            const fetchTenders = async () => {
+                try {
+                    // Fetching from the live API
+                    const response = await fetch(API_BASE_URL); 
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const tenders = await response.json();
+                    return tenders;
+                } catch (error) {
+                    console.error('There was a problem fetching tenders:', error);
+                    return [];
+                }
+            };
+
+            const displayTenders = async (searchTerm = '') => {
+                const tenders = await fetchTenders();
+                const tableBody = document.querySelector('#tenders-table tbody');
+                tableBody.innerHTML = '';
+
+                const filteredTenders = tenders.filter(tender => {
+                    const searchString = searchTerm.toLowerCase();
+                    return tender.bidNumber.toLowerCase().includes(searchString) || 
+                           tender.organizationName.toLowerCase().includes(searchString);
+                });
+
+                filteredTenders.forEach((tender, index) => {
+                    const row = document.createElement('tr');
+                    const now = new Date();
+                    const bidEndDate = new Date(tender.endDate);
+                    if (bidEndDate < now) {
+                        row.classList.add('completed');
+                    }
+
+                    row.innerHTML = `
+                        <td>${tender.bidNumber}</td>
+                        <td>${tender.organizationName}</td>
+                        <td>${new Date(tender.endDate).toLocaleString()}</td>
+                        <td>${bidEndDate < now ? 'Completed' : 'Active'}</td>
+                        <td>
+                            <button class="edit-btn" data-index="${index}">Edit</button>
+                            <button class="delete-btn" data-index="${index}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            };
+
+            const deleteTender = async (index) => {
+                // NOTE: This feature would require a DELETE API call on the backend
+                console.log('Delete feature needs a backend DELETE API endpoint.');
+                
+            };
+
+            const editTender = async (index) => {
+                // NOTE: This feature would require a PUT API call on the backend
+                console.log('Edit feature needs a backend PUT API endpoint.');
+                
+            };
+
+            const addOrUpdateTender = async (tender) => {
+                try {
+                    // Posting to the live API
+                    const response = await fetch(API_BASE_URL, { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(tender),
+                    });
+
+                    if (response.ok) {
+                        console.log('Tender sent to live server successfully!');
+                        displayTenders();
+                    } else {
+                        console.error('Failed to send tender to server.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            };
+
+            tenderForm.addEventListener('submit', (event) => {
+                event.preventDefault(); 
+                const index = document.getElementById('edit-index').value;
+
+                const tender = {
+                    bidNumber: document.getElementById('bid-number').value,
+                    startDate: document.getElementById('start-date').value,
+                    endDate: document.getElementById('end-date').value,
+                    organizationName: document.getElementById('organization-name').value,
+                    itemCategory: document.getElementById('item-category').value,
+                    bidToRa: document.getElementById('bid-to-ra').checked,
+                    preBidMeeting: document.getElementById('pre-bid-meeting').value,
+                    preBidQueries: document.getElementById('pre-bid-queries').value,
+                    postBidMeeting: document.getElementById('post-bid-meeting').value,
+                    postBidQueries: document.getElementById('post-bid-queries').value,
+                    submissionDate: document.getElementById('submission-date').value,
+                    technicalEvaluation: document.getElementById('technical-evaluation').value,
+                    disqualified: document.getElementById('disqualified').value,
+                    financialBid: document.getElementById('financial-bid').value,
+                };
+                
+                addOrUpdateTender(tender, index === '' ? null : parseInt(index));
+                tenderForm.reset();
+                document.getElementById('edit-index').value = '';
+                submitButton.textContent = 'Add Tender';
+            });
+            
+            document.querySelector('#tenders-table').addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-btn')) {
+                    const index = event.target.dataset.index;
+                    if (confirm('Are you sure you want to delete this tender?')) {
+                        deleteTender(index);
+                    }
+                }
+                if (event.target.classList.contains('edit-btn')) {
+                    const index = event.target.dataset.index;
+                    editTender(index);
+                }
+            });
+            
+            const checkNotifications = () => {
+                // Notification logic remains the same (client-side)
+                if (!("Notification" in window)) {
+                    console.log("This browser does not support desktop notification");
+                    return;
+                }
+                if (Notification.permission === "granted") {
+                    const tenders = JSON.parse(localStorage.getItem(`tenders_${username}`)) || [];
+                    const now = new Date();
+                    tenders.forEach(tender => {
+                        const bidEndDate = new Date(tender.endDate);
+                        const timeDifference = bidEndDate.getTime() - now.getTime();
+                        const hoursDifference = Math.ceil(timeDifference / (1000 * 60 * 60));
+                        if (hoursDifference > 0 && hoursDifference <= 24) {
+                            new Notification('Upcoming Tender Deadline!', {
+                                body: `Bid Number: ${tender.bidNumber} for ${tender.organizationName} is due in less than 24 hours!`,
+                                icon: 'https://www.petropath.com/wp-content/uploads/2021/08/cropped-favicon-1-32x32.png'
+                            });
+                        }
+                    });
+                }
+            };
+
+            const requestNotificationPermission = () => {
+                if (!("Notification" in window)) {
+                    console.log("This browser does not support desktop notification");
+                    return;
+                }
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        console.log("Notification permission granted!");
+                    } else {
+                        console.log("Notification permission denied.");
+                    }
+                });
+            };
+
+            const exportTendersAsCSV = () => {
+                const tenders = JSON.parse(localStorage.getItem(`tenders_${username}`)) || [];
+                if (tenders.length === 0) {
+                    alert("No tenders to export.");
+                    return;
+                }
+
+                const header = Object.keys(tenders[0]).join(',');
+                
+                const rows = tenders.map(tender => Object.values(tender).map(value => {
+                    const formattedValue = String(value).replace(/"/g, '""');
+                    return `"${formattedValue}"`;
+                }).join(','));
+
+                const csvContent = `${header}\n${rows.join('\n')}`;
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `tenders_${username}.csv`);
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            enableNotificationsButton.addEventListener('click', () => {
+                requestNotificationPermission();
+            });
+
+            exportBtn.addEventListener('click', () => {
+                exportTendersAsCSV();
+            });
+
+            searchInput.addEventListener('input', (event) => {
+                displayTenders(event.target.value);
+            });
+
+            checkNotifications();
+            displayTenders();
+        });
+    </script>
+</body>
+</html>
